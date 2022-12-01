@@ -1,0 +1,15 @@
+input = io.open("input.txt")
+elfcalories = {}
+current_cal_count = 0
+for line in input:lines() do
+	if line == "" then
+		table.insert(elfcalories, current_cal_count)
+		current_cal_count = 0
+	else
+		current_cal_count += tonumber(line)
+	end
+end
+table.sort(elfcalories, (a, b) -> (a > b))
+print(elfcalories[1])
+print "----part 2----"
+print(elfcalories[1] + elfcalories[2] + elfcalories[3])
