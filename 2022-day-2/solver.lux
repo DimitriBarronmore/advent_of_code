@@ -1,0 +1,98 @@
+input = io.open("input.txt")
+lines = {}
+for line in input:lines() do
+	table.insert(lines, line)
+end
+
+--[[
+	A / X - Rock
+	B / Y - Paper
+	C / Z - Scissors
+	
+	a1 > z3
+	b2 > x1
+	c3 > y2
+
+	x1 > c3
+	y2 > a1
+	z3 > b2
+
+	1. convert both sides to number
+	2. check if sides are equal; if so it's a tie
+	3. wrap lhs-1;
+		a > c, c > b, b > a
+	4. check equality
+
+
+	say it's A / Y
+	wrap(A) = C / Y = 3 / 2
+	3 != 2, rhs wins
+
+	say it's B / X
+	wrap(B) = A / X = 1 / 1
+	1 == 1, lhs wins
+
+	say it's C / Z
+	C / Z = 3 / 3; 3 == 3, draw
+
+	---part2---
+
+	1 = lose
+	2 = draw
+	3 = win
+
+	say it's B / X (paper / lose)
+	rhs needs to be A (rock)
+		rhs = lhs - 1
+
+	say it's A / Y (rock / draw)
+		rhs = lhs
+
+	say it's C / Z (scissors / win)
+	rhs needs to be A (rock)
+	rhs = lhs + 1
+
+	rhs = lhs + (rhs - 2)
+]]
+mask = {A = 1, X = 1, B = 2, Y = 2, C = 3, Z = 3}
+outcomes = {lose = 0, draw = 3, win = 6, 0, 3, 6}
+
+function wrap(num)
+	-- num -= 1
+	if num < 1 then
+		num = 3
+	elseif num > 3 then
+		num = 1
+	end
+	return num
+end
+
+score = 0
+for _, line in ipairs(lines) do
+	lhs = mask[line:sub(1, 1)]
+	rhs = mask[line:sub(-1)]
+	if lhs == rhs then
+		score += (outcomes.draw + rhs)
+	else
+		lhs = wrap(lhs - 1)
+		if lhs == rhs then
+			score += (outcomes.lose + rhs)
+		else
+			score += (outcomes.win + rhs)
+		end
+	end
+end
+print(score)
+
+print "----part2----"
+
+score = 0
+for _, line in ipairs(lines) do
+	lhs = mask[line:sub(1, 1)]
+	rhs = mask[line:sub(-1)]
+	-- to lose, -1. to win, +1. to tie, +0
+	choice = wrap(lhs + (rhs - 2))
+
+	score += outcomes[rhs] + choice
+end
+print(score)

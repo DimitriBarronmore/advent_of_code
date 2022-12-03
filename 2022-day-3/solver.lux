@@ -1,0 +1,47 @@
+input = io.open("input.txt")
+lines = {}
+for line in input:lines() do
+	table.insert(lines, line)
+end
+
+alphabet = "abcdefghijklmnopqrstuvwxyz"
+priorities = alphabet .. string.upper(alphabet)
+get_priority(x) -> return (priorities:find(x))
+
+priority_sum = 0
+for _, line in ipairs(lines) do
+	length = line:len()
+	pack1, pack2 = line:sub(1, length / 2), line:sub((length / 2) + 1)
+	lhsmemo = {}
+	for char in pack1:gmatch(".") do
+		lhsmemo[char] = true
+	end
+	for char in pack2:gmatch(".") do
+		if lhsmemo[char] then
+			priority_sum += get_priority(char)
+			break
+		end
+	end
+end
+print(priority_sum)
+
+print "----part2----"
+
+priority_sum = 0
+memo = { {}, {} }
+for count, line in ipairs(lines) do
+	if count % 3 == 0 then
+		for char in line:gmatch(".") do
+			if memo[1][char] and memo[2][char] then
+				priority_sum += get_priority(char)
+				break
+			end
+		end
+		memo = { {}, {} }
+	else
+		for char in line:gmatch(".") do
+			memo[count%3][char] = true
+		end
+	end
+end
+print(priority_sum)
