@@ -1,0 +1,38 @@
+input = io.open("input.txt")
+lines = {}
+for line in input:lines() do
+	table.insert(lines, line)
+end
+
+depth, horizontal = 0, 0
+for _, line in ipairs(lines) do
+	command_s, command_e = line:find("^%w+")
+	command = line:sub(command_s, command_e)
+	intensity = tonumber(line:sub(command_e + 2))
+	if command == "forward" then
+		horizontal += intensity
+	elseif command == "down" then
+		depth += intensity
+	elseif command == "up" then
+		depth -= intensity
+	end
+end
+print(depth * horizontal)
+
+print "----part2----"
+
+depth, horizontal, aim = 0, 0, 0
+for _, line in ipairs(lines) do
+	command_s, command_e = line:find("^%w+")
+	command = line:sub(command_s, command_e)
+	intensity = tonumber(line:sub(command_e + 2))
+	if command == "forward" then
+		horizontal += intensity
+		depth += aim * intensity
+	elseif command == "down" then
+		aim += intensity
+	elseif command == "up" then
+		aim -= intensity
+	end
+end
+print(depth * horizontal)

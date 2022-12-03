@@ -1,0 +1,46 @@
+input = io.open("input.txt")
+lines = {}
+for line in input:lines() do
+	table.insert(lines, line)
+end
+
+last_depth = nil
+number_increased = 0
+for _, line in ipairs(lines) do
+	depth = tonumber(line)
+	if last_depth and depth > last_depth then
+		number_increased += 1
+	end
+	last_depth = depth
+end
+print(number_increased)
+print "----part 2----"
+
+window = {}
+last_total = nil
+number_increased = 0
+for line_number, line in ipairs(lines) do
+
+	depth = tonumber(line)
+	table.insert(window, {depth, line_number})
+	if line_number > 3 then
+		table.remove(window, 1)
+		if #window < 3 then
+			break
+		end
+	end
+	if #window == 3 then
+		total = 0
+		-- local windowname = ""
+		for _, num in ipairs(window) do
+			-- windowname ..= num[2] .. "|"
+			total += num[1]
+		end
+		-- print(windowname, total, ((last_total and total > last_total ) and "increased" or "no increase"))
+		if last_total and total > last_total then
+			number_increased += 1
+		end
+		last_total = total
+	end
+end 
+print(number_increased)
