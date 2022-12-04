@@ -1,0 +1,50 @@
+input = io.open("input.txt")
+lines = {}
+for line in input:lines() do
+	table.insert(lines, line)
+end
+
+count = 0
+for _, line in ipairs(lines) do
+	_, _, lhs1, lhs2, rhs1, rhs2 = line:find("([0-9]+)-([0-9]+),([0-9]+)-([0-9]+)")
+	lhs1 = tonumber(lhs1)
+	lhs2 = tonumber(lhs2)
+	rhs1 = tonumber(rhs1)
+	rhs2 = tonumber(rhs2)
+
+	len_left, len_right = lhs2 - lhs1, rhs2 - rhs1
+	big, small = {lhs1, lhs2}, {rhs1, rhs2}
+	if len_left < len_right then
+		big, small = small, big
+	end
+
+	if small[1] >= big[1] and small[2] <= big[2] then
+		count += 1
+	end
+end
+print(count)
+
+print "----part2----"
+
+count = 0
+for _, line in ipairs(lines) do
+	_, _, lhs1, lhs2, rhs1, rhs2 = line:find("([0-9]+)-([0-9]+),([0-9]+)-([0-9]+)")
+	lhs1 = tonumber(lhs1)
+	lhs2 = tonumber(lhs2)
+	rhs1 = tonumber(rhs1)
+	rhs2 = tonumber(rhs2)
+
+	len_left, len_right = lhs2 - lhs1, rhs2 - rhs1
+	big, small = {lhs1, lhs2}, {rhs1, rhs2}
+	if len_left < len_right then
+		big, small = small, big
+	end
+
+	if small[1] >= big[1] and small[1] <= big[2] then
+		count += 1
+	elseif small[2] >= big[1] and small[2] <= big[2] then
+		count += 1
+	end
+
+end
+print(count)
