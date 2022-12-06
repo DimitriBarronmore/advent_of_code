@@ -64,13 +64,9 @@ end
 		elseif state == "move_items" then
 			_, _, num, from, to = line:find("move (%d+) from (%d+) to (%d+)")
 			if _ then
-
 				# if part == 1 then
-
 					move_boxes(boxes, num, from, to)
-
 				# elseif part == 2 then
-
 					move_boxes_2(boxes, num, from, to)
 				# end
 
