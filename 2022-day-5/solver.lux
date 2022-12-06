@@ -1,0 +1,95 @@
+input = io.open("input.txt")
+lines = {}
+for line in input:lines() do
+	table.insert(lines, line)
+end
+
+function stack_bottom(boxes, index, label)
+	if not boxes[index] then
+		boxes[index] = {}
+	end
+	table.insert(boxes[index], 1, label)
+end
+
+function move_boxes(boxes, number, from, to)
+	-- print(boxes, number, from, to)
+	number, from, to = tonumber(number), tonumber(from), tonumber(to)
+	stack_f, stack_t = boxes[from], boxes[to]
+	-- print(stack_f, stack_t)
+	for i = 1, number do
+		table.insert(stack_t, table.remove(stack_f))
+	end
+end
+
+function move_boxes_2(boxes, number, from, to)
+	number, from, to = tonumber(number), tonumber(from), tonumber(to)
+	stack_f, stack_t = boxes[from], boxes[to]
+	grab_stack = {}
+	for i = 1, number do
+		table.insert(grab_stack, 1, table.remove(stack_f))
+	end
+	for _, box in ipairs(grab_stack) do
+		table.insert(stack_t, box)
+	end
+end
+
+function print_boxes(boxes)
+	for _,box in ipairs(boxes) do
+		msg = "%s: ":format(_)
+		for _, label in ipairs(box) do
+			msg ..= label .. " "
+		end
+		print(msg)
+	end
+	print("-----------")
+end
+
+# for part = 1, 2 do
+	boxes = {}
+	state = "gather_boxes"
+	for _, line in ipairs(lines) do
+		-- gather boxes from input
+		if state == "gather_boxes" then
+			line_length = line:len()
+			cur_index = 1
+			cur_box = 1
+			while cur_index < line_length do
+				label = line:sub(cur_index + 1, cur_index + 1)
+				if label:match("%d") then
+					state = "move_items"
+					break
+				elseif label:match("%w") then
+					stack_bottom(boxes, cur_box, label)
+				end
+				cur_index += 4
+				cur_box += 1
+			end
+		elseif state == "move_items" then
+			_, _, num, from, to = line:find("move (%d+) from (%d+) to (%d+)")
+			if _ then
+
+				# if part == 1 then
+
+					move_boxes(boxes, num, from, to)
+
+				# elseif part == 2 then
+
+					move_boxes_2(boxes, num, from, to)
+				# end
+
+			end
+			-- print_boxes(boxes)
+		end
+	end
+	result = ""
+	for _, box in ipairs(boxes) do
+		-- print(_, box[#box])
+		result ..= box[#box]
+	end
+	print(result)
+	# if part == 1 then
+		print "----"
+	# end
+# end
+
+-- print_boxes(boxes)
