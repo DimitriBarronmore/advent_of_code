@@ -1,0 +1,39 @@
+input = io.open("input.txt"):read("*a")
+
+# for part = 1, 2 do
+	window = {}
+	# if part == 1 then
+		windowsize = 4
+	# else
+		windowsize = 14
+	# end
+	count = 0
+	result = nil
+	repeat
+		count += 1
+		char = input:sub(count, count)
+		table.insert(window, char)
+		if not window[char] then
+			window[char] = 1
+		else
+			window[char] += 1
+		end
+		if #window > windowsize then
+			removed = table.remove(window, 1)
+			window[removed] -= 1
+		end
+
+		if count >= windowsize then
+			finished = true
+			for i = 1, windowsize do
+				if window[window[i]] > 1 then
+					finished = false
+				end
+			end
+			if finished then
+				result = count
+			end
+		end
+	until result
+	print(result)
+# end
