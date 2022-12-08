@@ -1,0 +1,126 @@
+input = io.open("input.txt")
+
+local root_directory
+
+let create_folder = function(root, name)
+	filemt = {
+		__index: filemt;
+		__name: name;
+		new_file: (size, name) => self[name] = size;
+		new_subfolder: (name) => self[name] = create_folder(self, name);
+		chdir: (arg) => do
+			if arg == ".." then
+				return root
+			elseif arg == "/" then
+				return root_directory
+			else
+				if not self[arg] then
+					self[arg] = create_folder(self)
+				end
+				return self[arg]
+			end
+		end;
+		get_size: => do
+			totalsize = 0
+			for _, element in pairs(self) do
+				if type(element) == "number" then
+					totalsize += element
+				else
+					totalsize += element:get_size()
+				end
+			end
+			return totalsize
+		end;
+		debug: (indentation) => do
+			indentation |= 0
+			for key, element in pairs(self) do
+				local ident, name, label
+				ident = "  ":rep(indentation) .. "-"
+				name = key
+				if type(element) == "number" then
+					label = "file, size=" .. element
+				else
+					label = "dir"
+				end
+				print( "%s %s (%s)":format(ident, name, label))
+				if label == "dir" then
+					element:debug(indentation + 1)
+				end
+			end
+		end;
+		foreach: (func) => do
+			func(self)
+			for key, element in pairs(self) do
+				if type(element) == "table" then
+					element:foreach(func)
+				end
+			end
+		end;
+	}
+	filemt.__index = filemt
+	return setmetatable({}, filemt)
+end
+
+root_directory = create_folder(nil, "/")
+current_directory = root_directory
+
+
+for line in input:lines() do
+	tokens = {}
+	for tok in line:gmatch("[^$ ]+") do
+		table.insert(tokens, tok)
+	end
+	if tokens[1] == "cd" then
+		current_directory = current_directory:chdir(tokens[2])
+	elseif tokens[1] == "ls" then
+		-- no change needed
+	elseif tokens[1] == "dir" then
+		current_directory:new_subfolder(tokens[2])
+	elseif tokens[1]:match("%d+") then
+		tokens[1] = tonumber(tokens[1])
+		current_directory:new_file(tokens[1], tokens[2])
+	else
+		-- this should never be reached
+		error("unexpected instruction " .. tokens[1] .. " | " .. tokens[2])
+	end
+end
+
+total_size = 0
+root_directory:foreach(function(dir)
+	size = dir:get_size()
+	if size <= 100000 then
+		total_size += size
+	end
+end)
+print(total_size)
+
+print "---part2---"
+
+total_space = 70000000
+needed_space = 30000000
+used_space = root_directory:get_size()
+unused_space = total_space - used_space
+must_delete = needed_space - unused_space
+
+candidates = {}
+root_directory:foreach(function(dir)
+	size = dir:get_size()
+	if size >= must_delete then
+		table.insert(candidates, size)
+	end
+end)
+table.sort(candidates, (a, b) -> return (a < b))
+print(candidates[1])
+
+--[[ --NOTES-- 
+	This wasn't too bad. I decided to fully embrace the problem and build the filesystem as a heirarchy of objects, 
+	each with all the functionality needed to abstract the problem. That meant I had a bit of construction overhead of course,
+	but it also made solving the problem itself extremely easy since I just had to compose the tools.
+
+	The trick with parsing this one is you don't need to know whether the current line is a command or not, 
+	so you can strip out the "$" and split on spaces. Depending on the first token, you already know exactly what's going on.
+	Good puzzle design tbh.
+
+	This one features a bit more unique luxtre syntax and lead to me finding a new bug I had missed, which is fantastic. 
+	None of the new lambda syntax here is especially necessary, but I kind of like it.
+--]]

@@ -1,0 +1,125 @@
+input = io.open("input.txt")
+lines = {}
+for line in input:lines() do
+	table.insert(lines, line)
+end
+
+-- construct the grid
+grid = {}
+for count, line in ipairs(lines) do
+	current_row = {}
+	for char in line:gmatch("%d") do
+		tree = {height = tonumber(char), visible = false}
+		table.insert(current_row, tree)
+	end
+	table.insert(grid, current_row)
+end
+
+grid_height = #grid
+grid_width = #grid[1]
+
+function get_xy(x, y)
+	return grid[y][x]
+end
+
+
+number_visible = 0
+
+function check_visible(x, y, height)
+	tree = get_xy(x, y)
+	if tree.height > height then
+		if not tree.visible then
+			number_visible += 1
+		end
+		tree.visible = true
+		height = math.max(height, tree.height)
+	end
+	return height
+end
+-- mark trees as visible, starting from the edges
+-- top edge
+for x = 1, grid_width do
+	top_height = -1
+	for y = 1, grid_height do
+		top_height = check_visible(x, y, top_height)
+	end
+end
+--bottom edge
+for x = grid_width, 1, -1 do
+	top_height = -1
+	for y = grid_height, 1, -1 do
+		top_height = check_visible(x, y, top_height)
+	end
+end
+--left edge
+for y = 1, grid_height do
+	top_height = -1
+	for x = 1, grid_width do
+		top_height = check_visible(x, y, top_height)
+	end
+end
+--right edge
+for y = grid_height, 1, -1 do
+	top_height = -1
+	for x = grid_width, 1, -1 do
+		top_height = check_visible(x, y, top_height)
+	end
+end
+
+--debug
+
+for l, row in ipairs(grid) do
+	line = ""
+	for _, tree in ipairs(row) do
+		if tree.visible then
+			line ..= tree.height
+		else
+			line ..= "-"
+		end
+	end
+	print(line)
+end
+-- end debug
+
+print("visible:", number_visible)
+
+print "---part2---"
+
+function cast_ray(x, y, x2, y2)
+	base_tree = get_xy(x, y)
+	base_height = base_tree.height
+	view_distance = 0
+
+	nx, ny = x, y
+	while true do
+		nx, ny += x2, y2
+		if (nx >= 1 and nx <= grid_width) and (ny >= 1 and ny <= grid_height) then
+			next_tree = get_xy(nx, ny)
+			view_distance += 1
+			if next_tree.height >= base_height then
+				break
+			end
+		else
+			break
+		end
+	end
+	return view_distance
+end
+
+function get_scenic_score(x, y)
+	vl = cast_ray(x, y, -1, 0)
+	vr = cast_ray(x, y, 1, 0)
+	vu = cast_ray(x, y, 0, -1)
+	vd = cast_ray(x, y, 0, 1)
+	return vl * vr * vu * vd
+end
+
+highest_score = 0
+for x = 1, grid_width do
+	for y = 1, grid_height do
+		score = get_scenic_score(x, y)
+		highest_score = math.max(highest_score, score)
+	end
+end
+
+print("high score:", highest_score)
